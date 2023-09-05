@@ -1,4 +1,5 @@
 ﻿using Sharprompt;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace LR1
@@ -75,6 +76,22 @@ namespace LR1
         {
             if (_students.Count == 0) return;
             _students.Sort(new BirthDateComparer());
+            Console.WriteLine("Done!");
+        }
+
+        public void searchStudentByNumber()
+        {
+            Console.WriteLine("Enter number to find...");
+            string item = Console.ReadLine();
+            int index = _students.FindIndex(a => a.phone == item);
+            if (index != -1)
+            {
+                Console.WriteLine(_students[index]);
+            }
+            else
+            {
+                Console.WriteLine("Student not found.");
+            }
         }
     }
 
@@ -110,10 +127,11 @@ namespace LR1
 
             while (flag == true)
             {
-                var menu = Prompt.Select("Select", new[] { "Display all students", "Delete student", "Add student", "Sort students", "exit" });
+                var menu = Prompt.Select("Select", new[] { "Display all students", "Delete student", "Add student", "Find student by phone", "Sort students", "exit" });
                 if (menu == "Display all students") { list.displayAllStudents(); }
                 if (menu == "Add student") { list.addStudentFromConsole(); }
                 if (menu == "Delete student") { list.deleteStudent(); }
+                if (menu == "Find student by phone") { list.searchStudentByNumber(); }
                 if (menu == "Sort students") { list.displaySortedStudents(); }
                 if (menu == "exit") { flag = false; }
             }
