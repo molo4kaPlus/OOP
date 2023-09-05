@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace LR1
 {
-    public class student
+    public class student 
     {
         public string phone { get; set; }
         public string fullName { get; set; }
@@ -34,20 +34,47 @@ namespace LR1
 
         public void addStudentFromConsole()
         {
-            Console.WriteLine("Enter full name,birthdate(YMD), phone number...");
+            DateOnly date;
+            Console.WriteLine("Enter full name...");
+            string fullName = Console.ReadLine();
+            Console.WriteLine("Enter birth date (YMD)...");
+            try { date = new DateOnly(Convert.ToInt16(Console.ReadLine()), Convert.ToInt16(Console.ReadLine()), Convert.ToInt16(Console.ReadLine())); }
+            catch (Exception ex) { Console.WriteLine("Wrong entered YMD, returning to menu..."); return; }
+            Console.WriteLine("Enter phone number...");
+            string phone = Console.ReadLine();
+
             student temp = new student
             {
-                fullName = Console.ReadLine(),
-                birthDate = new DateOnly(
-                    Convert.ToInt32(Console.ReadLine()),
-                    Convert.ToInt32(Console.ReadLine()),
-                    Convert.ToInt32(Console.ReadLine())),
-                phone = Console.ReadLine()
+                fullName = fullName,
+                birthDate = date,
+                phone = phone
             };
 
             if (temp == null) { throw new ArgumentNullException(nameof(student)); }
             if (string.IsNullOrEmpty(temp.fullName)) { throw new ArgumentNullException(nameof(student.fullName)); }
             _students.Add(temp);
+        }
+
+        public void deleteStudent()
+        {
+            Console.WriteLine("Welcome to the delete menu!");
+            var deleteMenu = Prompt.Select("Select", _students);
+            _students.Remove(deleteMenu); 
+        }
+
+        private class BirthDateComparer : Comparer<student>
+        {
+            public override int Compare(student? x, student? y)
+            {
+                return x.birthDate.CompareTo(y.birthDate);
+            }
+        }
+
+        // sorting by birth date
+        public void displaySortedStudents()
+        {
+            if (_students.Count == 0) return;
+            _students.Sort(new BirthDateComparer());
         }
     }
 
@@ -64,22 +91,30 @@ namespace LR1
 
             list.addStudentFromCode(new student
             {
+                fullName = "Кузнецов Генадий Глебович",
+                birthDate = new DateOnly(2005, 3, 12),
+                phone = "79518384664"
+            });
+            list.addStudentFromCode(new student
+            {
                 fullName = "Кузьмин Глеб Олегович",
                 birthDate = new DateOnly(2000, 12, 8),
                 phone = "795181815625"
             });
             list.addStudentFromCode(new student
             {
-                fullName = "Жмышенко Альберт АХмедович",
+                fullName = "Жмышенко Альберт Ахмедович",
                 birthDate = new DateOnly(2003, 5, 8),
                 phone = "88005556565"
             });
 
             while (flag == true)
             {
-                var menu = Prompt.Select("Select", new[] { "Add new student", "Display all students", "exit" });
-                if (menu == "Add new student") { list.addStudentFromConsole(); }
+                var menu = Prompt.Select("Select", new[] { "Display all students", "Delete student", "Add student", "Sort students", "exit" });
                 if (menu == "Display all students") { list.displayAllStudents(); }
+                if (menu == "Add student") { list.addStudentFromConsole(); }
+                if (menu == "Delete student") { list.deleteStudent(); }
+                if (menu == "Sort students") { list.displaySortedStudents(); }
                 if (menu == "exit") { flag = false; }
             }
         }
