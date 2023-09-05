@@ -86,7 +86,7 @@ namespace LR1
             int index = _students.FindIndex(a => a.phone == item);
             if (index != -1)
             {
-                Console.WriteLine(_students[index]);
+                Console.WriteLine(_students[index]);     
             }
             else
             {
