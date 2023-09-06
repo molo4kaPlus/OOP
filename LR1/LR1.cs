@@ -79,6 +79,7 @@ namespace LR1
             Console.WriteLine("Done!");
         }
 
+        // find by number
         public void searchStudentByNumber()
         {
             Console.WriteLine("Enter number to find...");
@@ -86,12 +87,38 @@ namespace LR1
             int index = _students.FindIndex(a => a.phone == item);
             if (index != -1)
             {
+                Console.WriteLine("Found one!");
                 Console.WriteLine(_students[index]);     
             }
-            else
+            else { Console.WriteLine("Student not found..."); }
+        }
+
+        // find by full name
+        public void searchStudentByFullName()
+        {
+            Console.WriteLine("Enter full name to find...");
+            string toFind = Console.ReadLine();
+            int index = _students.FindIndex(a => a.fullName == toFind);
+            if (index != -1)
             {
-                Console.WriteLine("Student not found.");
+                Console.WriteLine("Found one!");
+                Console.WriteLine(_students[index]);
             }
+            else { Console.WriteLine("Student not found..."); }
+        }
+
+        // find by birth date
+        public void searchStudentByBirthDate()
+        {
+            Console.WriteLine("Enter birth date to find (YMD)...");
+            DateOnly toFind = new DateOnly(Convert.ToInt16(Console.ReadLine()), Convert.ToInt16(Console.ReadLine()), Convert.ToInt16(Console.ReadLine()));
+            int index = _students.FindIndex(a => a.birthDate == toFind);
+            if (index != -1) 
+            {
+                Console.WriteLine("Found one!");
+                Console.WriteLine(_students[index]);
+            }
+            else { Console.WriteLine("Student not found..."); }
         }
     }
 
@@ -100,7 +127,18 @@ namespace LR1
        static void Main()
         {
             bool flag = true;
-            student[] students; 
+            student[] students;
+            string[] menuArguments =
+            {
+                "Display all students",
+                "Delete student",
+                "Add student",
+                "Find student by phone",
+                "Find student by birth date",
+                "Find student by full name",
+                "Sort students (by birth date)",
+                "exit"
+            };
 
             Console.WriteLine("Hello! Welcome to the group manager!");
 
@@ -124,15 +162,29 @@ namespace LR1
                 birthDate = new DateOnly(2003, 5, 8),
                 phone = "88005556565"
             });
+            list.addStudentFromCode(new student
+            {
+                fullName = "Горбунов Егор Андреевич",
+                birthDate = new DateOnly(2004, 2, 18),
+                phone = "89995836087"
+            });
+            list.addStudentFromCode(new student
+            {
+                fullName = "Новиков Иван Андреевич",
+                birthDate = new DateOnly(2003, 11, 25),
+                phone = "79631560869"
+            });
 
             while (flag == true)
             {
-                var menu = Prompt.Select("Select", new[] { "Display all students", "Delete student", "Add student", "Find student by phone", "Sort students", "exit" });
+                var menu = Prompt.Select("Select", menuArguments);
                 if (menu == "Display all students") { list.displayAllStudents(); }
                 if (menu == "Add student") { list.addStudentFromConsole(); }
                 if (menu == "Delete student") { list.deleteStudent(); }
                 if (menu == "Find student by phone") { list.searchStudentByNumber(); }
-                if (menu == "Sort students") { list.displaySortedStudents(); }
+                if (menu == "Find student by birth date") { list.searchStudentByBirthDate(); }
+                if (menu == "Find student by full name") { list.searchStudentByFullName(); }
+                if (menu == "Sort students (by birth date)") { list.displaySortedStudents(); }
                 if (menu == "exit") { flag = false; }
             }
         }
