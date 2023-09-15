@@ -8,6 +8,8 @@ namespace LR2
     {
         private readonly List<int> _array;
         public array(List<int> array) { _array = array;  }
+
+        // Выводим множество как строку.
         public override string ToString()
         {
             string str = "";
@@ -17,15 +19,18 @@ namespace LR2
             }
             return $"{str}";
         }
+
+        // Добавляем элемент в множество.
         public array Add(int ToAdd)
         {
             _array.Add(ToAdd);
             return new array(_array);
         }
 
-        public array Remove(int ToRemove) 
+        // Удаляем элемент из множества.
+        public array Remove(int target) 
         {
-
+            _array.RemoveAt(_array.IndexOf(target));
             return new array(_array);
         }
 
@@ -46,6 +51,8 @@ namespace LR2
                 "Show array B",
                 "Add a number to array A",
                 "Add a number to array B",
+                "Remove a number from array A",
+                "Remove a number from array B",
                 "Exit"
             };
 
@@ -58,9 +65,10 @@ namespace LR2
                 var menu = Prompt.Select("Select", menuArguments);
                 if (menu == "Show array A") { Console.WriteLine(arrayA.ToString()); }
                 if (menu == "Show array B") { Console.WriteLine(arrayB.ToString()); }
-                if (menu == "Add a number to array A") { Console.WriteLine("Enter a number to add.."); arrayA.Add(Convert.ToInt32(Console.ReadLine())); }
-                if (menu == "Add a number to array B") { Console.WriteLine("Enter a number to add.."); arrayB.Add(Convert.ToInt32(Console.ReadLine())); }
-                //if (menu == "Show array A and B") { Console.WriteLine(arrayA.ToString()); Console.WriteLine(arrayB.ToString); }
+                if (menu == "Add a number to array A") { Console.WriteLine("Enter a number to add..."); arrayA.Add(Convert.ToInt32(Console.ReadLine())); }
+                if (menu == "Add a number to array B") { Console.WriteLine("Enter a number to add..."); arrayB.Add(Convert.ToInt32(Console.ReadLine())); }
+                if (menu == "Remove a number from array A") { Console.WriteLine("Enter a number to remove..."); arrayA.Remove(Convert.ToInt32(Console.ReadLine())); }
+                if (menu == "Remove a number from array B") { Console.WriteLine("Enter a number to remove..."); arrayB.Remove(Convert.ToInt32(Console.ReadLine())); }
                 if (menu == "Exit") { flag = false; }
             }
         }
