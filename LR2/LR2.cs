@@ -58,8 +58,8 @@ namespace LR2
                 var menu = Prompt.Select("Select", menuArguments);
                 if (menu == "Show array A") { Console.WriteLine(arrayA.ToString()); }
                 if (menu == "Show array B") { Console.WriteLine(arrayB.ToString()); }
-                if (menu == "Add a number to array A") { arrayA.Add(Convert.ToInt32(Console.ReadLine())); }
-                if (menu == "Add a number to array B") { arrayB.Add(Convert.ToInt32(Console.ReadLine())); }
+                if (menu == "Add a number to array A") { Console.WriteLine("Enter a number to add.."); arrayA.Add(Convert.ToInt32(Console.ReadLine())); }
+                if (menu == "Add a number to array B") { Console.WriteLine("Enter a number to add.."); arrayB.Add(Convert.ToInt32(Console.ReadLine())); }
                 //if (menu == "Show array A and B") { Console.WriteLine(arrayA.ToString()); Console.WriteLine(arrayB.ToString); }
                 if (menu == "Exit") { flag = false; }
             }
