@@ -34,10 +34,17 @@ namespace LR2
             return new array(_array);
         }
 
-        //public static array operator +(array arrayA, array arrayB)
-        //{
-        //    return new array(0);
-        //}
+        // Сравнивем множества. Если они разной длины, не сравниваем.
+        public void Compare(array compare_array)
+        {
+            if (compare_array._array.Count != _array.Count) { Console.WriteLine("Arrays has different length!"); return; }
+            for (int num = 0; num < _array.Count - 1; num ++ )
+            {
+                if (_array[num] == compare_array._array[num]) { }
+                else { Console.WriteLine("Arrays are not identical!"); return; }
+            }
+            Console.WriteLine("Arrays are identical!");
+        }
     }
 
     class LR2
@@ -53,11 +60,12 @@ namespace LR2
                 "Add a number to array B",
                 "Remove a number from array A",
                 "Remove a number from array B",
+                "Compare arrays",
                 "Exit"
             };
 
             array arrayA = new array(new List<int> { 1, 2, 3 });
-            array arrayB = new array(new List<int> { 3, 2, 1 });
+            array arrayB = new array(new List<int> { 1, 2, 3 });
 
             Console.WriteLine("Welcome to the menu!");
             while (flag == true)
@@ -69,6 +77,7 @@ namespace LR2
                 if (menu == "Add a number to array B") { Console.WriteLine("Enter a number to add..."); arrayB.Add(Convert.ToInt32(Console.ReadLine())); }
                 if (menu == "Remove a number from array A") { Console.WriteLine("Enter a number to remove..."); arrayA.Remove(Convert.ToInt32(Console.ReadLine())); }
                 if (menu == "Remove a number from array B") { Console.WriteLine("Enter a number to remove..."); arrayB.Remove(Convert.ToInt32(Console.ReadLine())); }
+                if (menu == "Compare arrays") { arrayA.Compare(arrayB); }
                 if (menu == "Exit") { flag = false; }
             }
         }
