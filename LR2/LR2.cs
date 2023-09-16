@@ -1,4 +1,5 @@
 ﻿using Sharprompt;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -23,6 +24,7 @@ namespace LR2
         // Добавляем элемент в множество.
         public array Add(int ToAdd)
         {
+            if (_array.Contains(ToAdd)) { Console.WriteLine("Array already has this number!"); return new array(_array); }
             _array.Add(ToAdd);
             return new array(_array);
         }
@@ -45,6 +47,16 @@ namespace LR2
             }
             Console.WriteLine("Arrays are identical!");
         }
+        // вычитаем множество из множества.
+        public void Subtract(array ToSubtract_array)
+        {
+            for (int num = 0; num <= _array.Count - 1; num++)
+            {
+                if (ToSubtract_array._array.Contains(_array[num]))
+                    ToSubtract_array.Remove(_array[num]);
+            }
+            Console.WriteLine("Done!");
+        }
     }
 
     class LR2
@@ -61,11 +73,13 @@ namespace LR2
                 "Remove a number from array A",
                 "Remove a number from array B",
                 "Compare arrays",
+                "Substract arrays (A from B)",
+                "Substract arrays (B from A)",
                 "Exit"
             };
 
-            array arrayA = new array(new List<int> { 1, 2, 3 });
-            array arrayB = new array(new List<int> { 1, 2, 3 });
+            array arrayA = new array(new List<int> { 1, 2, 3, 5 });
+            array arrayB = new array(new List<int> { 1, 2, 3, 8 });
 
             Console.WriteLine("Welcome to the menu!");
             while (flag == true)
@@ -78,6 +92,8 @@ namespace LR2
                 if (menu == "Remove a number from array A") { Console.WriteLine("Enter a number to remove..."); arrayA.Remove(Convert.ToInt32(Console.ReadLine())); }
                 if (menu == "Remove a number from array B") { Console.WriteLine("Enter a number to remove..."); arrayB.Remove(Convert.ToInt32(Console.ReadLine())); }
                 if (menu == "Compare arrays") { arrayA.Compare(arrayB); }
+                if (menu == "Substract arrays (A from B)") { arrayA.Subtract(arrayB); }
+                if (menu == "Substract arrays (B from A)") { arrayB.Subtract(arrayA); }
                 if (menu == "Exit") { flag = false; }
             }
         }
