@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Xml.Serialization;
 //стандартная библиотка .NET
 
 namespace LR3
@@ -15,60 +14,59 @@ namespace LR3
             square,
             rectangle
         }
-        [XmlInclude(typeof(Rectangle))]
         public abstract class Figure
         {
             protected FigureType _FigureType;
+            protected int _Height;
+            protected int _Width;
             protected Figure() { }
+            public FigureType Type
+            {
+                get { return _FigureType; }
+                set { _FigureType = value; }
+            }
+            public int Height
+            {
+                get { return _Height; }
+                set { _Height = value; }
+            }
+            public int Width
+            {
+                get { return _Width; }
+                set { _Width = value; }
+            }
+            public abstract double SpaceNB { get; }
             protected Figure(FigureType type)
             {
                 Type = type;
             }
-            public FigureType Type
-            {
-                get { return _FigureType; }
-                set
-                {
-                    _FigureType = value;
-                }
-            }
-            public abstract double SpaceNoBorder { get; }
-            public abstract double SpaceBorder { get; }
         }
         public class Rectangle : Figure
         {
-            public int Width { get; set; }
-            public int Height { get; set; }
-            public double Thickness { get; set; }
             public Rectangle() { }
-            public Rectangle(FigureType type, int width, int height, double thickness)
-                :base (type)
+            public Rectangle(FigureType type, int height, int width)
             {
-                Width = width;
-                Height = height;
-                Thickness = thickness;
+                _FigureType = type;
+                _Height = height;
+                _Width = width;
             }
-            public override double SpaceNoBorder
+            public override double SpaceNB
             {
-                get { return Width * Height; }
-            }
-            public override double SpaceBorder
-            {
-                get { return (Width + Thickness) * (Height + Thickness); }
+                get { return _Width * _Height; }
             }
         }
         public class GraphicRedactor
         {
             private readonly List<Figure> _figures = new List<Figure>();
-            public double TotalSpaceNoBorder
-            {
-                get
-                {
-                    double space = 0;
-                    foreach (var figure in _figures) { space += figure.SpaceNoBorder; }
-                    return space;
-                }
-            }
+            //public double TotalSpaceNoBorder
+            //{
+            //    get
+            //    {
+            //        double space = 0;
+            //        foreach (var figure in _figures) { space += figure.SpaceNoBorder; }
+            //        return space;
+            //    }
+            //}
             public void Add(Figure figure)
             {
                 if (figure == null || figure.Type == FigureType.None)
@@ -81,38 +79,24 @@ namespace LR3
             {
                 return _figures;
             }
-            private class BySpaceComparerNoBorder : IComparer<Figure>
+            //private class BySpaceComparerNoBorder : IComparer<Figure>
+            //{
+            //    public int Compare(Figure x, Figure y)
+            //    {
+            //        return x.SpaceNoBorder.CompareTo(y.SpaceNoBorder);  
+            //    }
+            //}
+            //public void SortBySpaceNoBorder()
+            //{
+            //    _figures.Sort(new BySpaceComparerNoBorder());
+            //}
+            public void ToJson(string filename)
             {
-                public int Compare(Figure x, Figure y)
-                {
-                    return x.SpaceNoBorder.CompareTo(y.SpaceNoBorder);  
-                }
-            }
-            public void SortBySpaceNoBorder()
-            {
-                _figures.Sort(new BySpaceComparerNoBorder());
-            }
-            public void ToXML (string filename)
-            {
-                var serializer = new XmlSerializer(typeof(List<Figure>));
+                var options = new JsonSerializerOptions { WriteIndented = true };
                 using (var stream = File.OpenWrite(filename))
                 {
-                    serializer.Serialize(stream, _figures);
-                    stream.Flush();
+                    JsonSerializer.Serialize(stream, _figures, options);
                 }
-            }
-            public static GraphicRedactor FromXML (string filename)
-            {
-                var graphicRedactor = new GraphicRedactor();
-                var serializer = new XmlSerializer (typeof(List<Figure>));
-
-                using (var stream = File.OpenRead(filename))
-                {
-                    var figures = serializer.Deserialize(stream) as IEnumerable<Figure>;
-                    if (figures != null) { graphicRedactor._figures.AddRange(figures); }
-                }
-
-                return graphicRedactor;
             }
         }
         //жопа
@@ -121,24 +105,27 @@ namespace LR3
             List<Figure> figures123 = new List<Figure>();
             var myGraphicRedactor = new GraphicRedactor();
 
-            myGraphicRedactor.Add(new Rectangle(FigureType.square, 2, 3, 0.3));
-            myGraphicRedactor.Add(new Rectangle(FigureType.square, 3, 3, 0.5));
+            myGraphicRedactor.Add(new Rectangle(FigureType.square, 1, 2));
+            myGraphicRedactor.Add(new Rectangle(FigureType.square, 2, 1));
 
-            myGraphicRedactor.SortBySpaceNoBorder();
+            //myGraphicRedactor.SortBySpaceNoBorder();
 
-            const string filename = @"c:\users\gleb\xml.xml";
-            myGraphicRedactor.ToXML(filename);
+            const string filename = "json.json";
 
-            try
-            {
-                var myGraphicRedactorNew = GraphicRedactor.FromXML(filename);
-                foreach (var figure in myGraphicRedactorNew.GetFigures())
-                {
-                    Console.WriteLine($"Figure: {figure.Type}");
-                }
-                Console.WriteLine($"\nTotalSpace = {myGraphicRedactorNew.TotalSpaceNoBorder}");
-            }
-            catch (Exception ex) { Console.WriteLine($"Error: {ex.Message}"); }
+            myGraphicRedactor.ToJson(filename);
+
+            //myGraphicRedactor.ToXML(filename);
+
+            //try
+            //{
+            //    var myGraphicRedactorNew = GraphicRedactor.FromXML(filename);
+            //    foreach (var figure in myGraphicRedactorNew.GetFigures())
+            //    {
+            //        Console.WriteLine($"Figure: {figure.Type}");
+            //    }
+            //    Console.WriteLine($"\nTotalSpace = {myGraphicRedactorNew.TotalSpaceNoBorder}");
+            //}
+            //catch (Exception ex) { Console.WriteLine($"Error: {ex.Message}"); }
         }
     }
 }
