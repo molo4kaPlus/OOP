@@ -84,13 +84,12 @@ namespace LR3
             private class BySpaceComparerNoBorder : IComparer<Figure>
             {
                 public int Compare(Figure x, Figure y)
-            {
+                {
                     return x.SpaceNoBorder.CompareTo(y.SpaceNoBorder);  
+                }
             }
-            public abstract double GetSpace();
-        }
             public void SortBySpaceNoBorder()
-        {
+            {
                 _figures.Sort(new BySpaceComparerNoBorder());
             }
             public void ToXML (string filename)
@@ -116,7 +115,7 @@ namespace LR3
                 return graphicRedactor;
             }
         }
-
+        //жопа
         static void Main()
         {
             List<Figure> figures123 = new List<Figure>();
