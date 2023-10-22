@@ -76,12 +76,13 @@ namespace LR3
             private class BySpaceComparerNoBorder : IComparer<Figure>
             {
                 public int Compare(Figure x, Figure y)
-                {
-                    return x.SpaceNoBorder.CompareTo(y.SpaceNoBorder);  
-                }
-            }
-            public void SortBySpaceNoBorder()
             {
+                    return x.SpaceNoBorder.CompareTo(y.SpaceNoBorder);  
+            }
+            public abstract double GetSpace();
+        }
+            public void SortBySpaceNoBorder()
+        {
                 _figures.Sort(new BySpaceComparerNoBorder());
             }
         }
