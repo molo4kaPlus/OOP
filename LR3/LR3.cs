@@ -16,6 +16,7 @@ namespace LR3
             square,
             rectangle
         }
+        [JsonDerivedType(typeof(Rectangle), "Rectangle")]
         public abstract class Figure
         {
             protected FigureType _FigureType;
@@ -126,6 +127,15 @@ namespace LR3
                 else { return default; }
                 return temp;
             }
+        }
+        //TODO
+        public class Menu
+        {
+            string[] menuArgs =
+            {
+                
+            };
+
         }
         //жопа
         static void Main()
