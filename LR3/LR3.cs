@@ -54,9 +54,9 @@ namespace LR3
         public class Rectangle : Figure
         {
             public Rectangle() { }
-            public Rectangle(FigureType type, int height, int width, int thickness)
+            public Rectangle(int height, int width, int thickness)
             {
-                _FigureType = type;
+                _FigureType = FigureType.rectangle;
                 _Height = height;
                 _Width = width;
                 _Thickness = thickness;
@@ -89,6 +89,10 @@ namespace LR3
                     throw new ArgumentException(nameof(figure));
                 }
                 _figures.Add(figure);
+            }
+            public Figure GetFigure(int num)
+            {
+                return _figures[num];
             }
             public IEnumerable<Figure> GetFigures()
             {
@@ -129,6 +133,39 @@ namespace LR3
             }
         }
         //TODO
+        public static void DrawFigure(Figure figure)
+        {
+            if (figure.Type == FigureType.rectangle) { DrawRectangle(figure); }
+
+            void DrawRectangle(Figure figure)
+            {
+                bool[,] desk = new bool [50, 100];
+                DrawOXY(desk);
+                DrawDesk(desk);
+            }
+
+            void DrawDesk(bool[,] desk)
+            {
+                int x = desk.GetLength(0);
+                int y = desk.GetLength(1);
+                for (int i = 0; i < x; i++) 
+                {
+                    for (int j = 0;  j < y; j++)
+                    {
+                        if (desk[i, j]) { Console.Write("*"); }
+                        else { Console.Write(" "); }
+                    }
+                    Console.WriteLine();
+                }
+            }
+            void DrawOXY(bool[,] desk)
+            {
+                int x = desk.GetLength(0);
+                int y = desk.GetLength(1);
+                for (int i = 0; i < x; i++) { desk[i, y/2] = true; }
+            }
+        }
+        //TODO
         public class Menu
         {
             string[] menuArgs =
@@ -140,19 +177,19 @@ namespace LR3
         //жопа
         static void Main()
         {
-            List<Figure> figures123 = new List<Figure>();   
             var myGraphicRedactor = new GraphicRedactor();
 
-            myGraphicRedactor.Add(new Rectangle(FigureType.square, 1, 2, 1));
-            myGraphicRedactor.Add(new Rectangle(FigureType.square, 2, 2, 2));
-            myGraphicRedactor.Add(new Rectangle(FigureType.square, 2, 2, 1));
-            myGraphicRedactor.Add(new Rectangle(FigureType.square, 3, 3, 1));
+            myGraphicRedactor.Add(new Rectangle(1, 2, 1));
+            myGraphicRedactor.Add(new Rectangle(2, 2, 2));
+            myGraphicRedactor.Add(new Rectangle(2, 2, 1));
+            myGraphicRedactor.Add(new Rectangle(3, 3, 1));
 
             myGraphicRedactor.SortBySpaceNoBorder();
 
             const string filename = "json.json";
             myGraphicRedactor.ToJson(filename);
             //myGraphicRedactor.ToXML(filename);
+            DrawFigure(myGraphicRedactor.GetFigure(0));
 
             try
             {
