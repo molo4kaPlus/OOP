@@ -17,6 +17,8 @@ namespace LR3
             rectangle
         }
         [JsonDerivedType(typeof(Rectangle), "Rectangle")]
+        [JsonDerivedType(typeof(Square), "Square")]
+        [JsonDerivedType(typeof(Ellipse), "Ellipse")]
         public abstract class Figure
         {
             protected FigureType _FigureType;
@@ -61,14 +63,34 @@ namespace LR3
                 _Width = width;
                 _Thickness = thickness;
             }
-            public override double SpaceNB
+            public override double SpaceNB { get { return _Width * _Height; } }
+            public override double SpaceB { get { return (_Width + _Thickness) * (_Height + _Thickness); } }
+        }
+        public class Square : Figure
+        {
+            public Square() { }
+            public Square(int sides, int thickness) 
             {
-                get { return _Width * _Height; }
+                _FigureType =FigureType.square;
+                _Height = sides;
+                _Width = sides;
+                _Thickness = thickness;
             }
-            public override double SpaceB
+            public override double SpaceNB { get { return _Width * _Height; } }
+            public override double SpaceB { get { return (_Width + _Thickness) * (_Height + _Thickness); } }
+        }
+        public class Ellipse : Figure
+        {
+            public Ellipse() { }
+            public Ellipse(int height,  int width, int thickness)
             {
-                get { return (_Width + _Thickness) * (_Height + _Height); }
+                _FigureType=FigureType.ellipse;
+                _Height = height;
+                _Width = width;
+                _Thickness = thickness;
             }
+            public override double SpaceNB { get { return (3.1416 * (_Height / 2) * (_Width / 2)); } }
+            public override double SpaceB { get { return (3.1416 * ((_Height + _Thickness) / 2) * ((_Width + _Thickness) / 2)); } }
         }
         public class GraphicRedactor
         {
@@ -136,14 +158,51 @@ namespace LR3
         public static void DrawFigure(Figure figure)
         {
             if (figure.Type == FigureType.rectangle) { DrawRectangle(figure); }
+            if (figure.Type == FigureType.square) { DrawSquare(figure); }
+            if (figure.Type == FigureType.ellipse) { DrawEllipse(figure); }
 
-            void DrawRectangle(Figure figure)
+            void DrawEllipse(Figure figure) 
             {
-                bool[,] desk = new bool [50, 100];
-                DrawOXY(desk);
+                
+            }
+            void DrawSquare(Figure figure)
+            {
+                bool[,] desk = new bool[30, 30];
+                int Cx = desk.GetLength(0) / 2;
+                int Cy = desk.GetLength(1) / 2;
+                int x1, x2, y1, y2;
+                x1 = Cx - figure.Width / 2;
+                y1 = Cy - figure.Height / 2;
+                x2 = Cx + figure.Width / 2;
+                y2 = Cy + figure.Height / 2;
+                for (int i = x1; i <= x2; i++) { desk[y1, i] = true; }
+                for (int i = y1; i <= y2; i++) { desk[i, x1] = true; }
+                for (int i = x2; i >= x1; i--) { desk[y2, i] = true; }
+                for (int i = y2; i >= y1; i--) { desk[i, x2] = true; }
+
+                DrawOXY(desk);    //елси надо отаброзить координатные прямые
                 DrawDesk(desk);
             }
+            void DrawRectangle(Figure figure)
+            {
+                bool[,] desk = new bool [30, 30];
+                int Cx = desk.GetLength(0) / 2;
+                int Cy = desk.GetLength(1) / 2;
+                int x1, x2, y1, y2;
 
+                x1 = Cx - figure.Width/2;
+                y1 = Cy - figure.Height/2;
+                x2 = Cx + figure.Width/2;
+                y2 = Cy + figure.Height/2;
+
+                for (int i = x1; i <= x2; i++) { desk[y1, i] = true; }
+                for (int i = y1; i <= y2; i++) { desk[i, x1] = true; }
+                for (int i = x2; i >= x1; i--) { desk[y2, i] = true; }
+                for (int i = y2; i >= y1; i--) { desk[i, x2] = true; }
+                
+                DrawOXY(desk);    //елси надо отаброзить координатные прямые
+                DrawDesk(desk);
+            }
             void DrawDesk(bool[,] desk)
             {
                 int x = desk.GetLength(0);
@@ -152,8 +211,8 @@ namespace LR3
                 {
                     for (int j = 0;  j < y; j++)
                     {
-                        if (desk[i, j]) { Console.Write("*"); }
-                        else { Console.Write(" "); }
+                        if (desk[i, j]) { Console.Write("* "); }
+                        else { Console.Write("  "); }
                     }
                     Console.WriteLine();
                 }
@@ -163,6 +222,7 @@ namespace LR3
                 int x = desk.GetLength(0);
                 int y = desk.GetLength(1);
                 for (int i = 0; i < x; i++) { desk[i, y/2] = true; }
+                for (int i = 0; i < y; i++) { desk[x/2, i] = true; }
             }
         }
         //TODO
@@ -177,12 +237,12 @@ namespace LR3
         //жопа
         static void Main()
         {
+            bool isDrawOSYTrue = false;
             var myGraphicRedactor = new GraphicRedactor();
 
-            myGraphicRedactor.Add(new Rectangle(1, 2, 1));
-            myGraphicRedactor.Add(new Rectangle(2, 2, 2));
-            myGraphicRedactor.Add(new Rectangle(2, 2, 1));
-            myGraphicRedactor.Add(new Rectangle(3, 3, 1));
+            myGraphicRedactor.Add(new Rectangle(8, 8, 1));
+            myGraphicRedactor.Add(new Square(5, 1));
+            myGraphicRedactor.Add(new Ellipse(4, 4, 1));
 
             myGraphicRedactor.SortBySpaceNoBorder();
 
