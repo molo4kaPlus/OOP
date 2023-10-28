@@ -19,6 +19,7 @@ namespace LR3
         [JsonDerivedType(typeof(Rectangle), "Rectangle")]
         [JsonDerivedType(typeof(Square), "Square")]
         [JsonDerivedType(typeof(Ellipse), "Ellipse")]
+        [JsonDerivedType(typeof(Circle), "Circle")]
         public abstract class Figure
         {
             protected FigureType _FigureType;
@@ -92,6 +93,19 @@ namespace LR3
             public override double SpaceNB { get { return (3.1416 * (_Height / 2) * (_Width / 2)); } }
             public override double SpaceB { get { return (3.1416 * ((_Height + _Thickness) / 2) * ((_Width + _Thickness) / 2)); } }
         }
+        public class Circle : Figure
+        {
+            public Circle() { }
+            public Circle(int radius,  int thickness)
+            {
+                _FigureType = FigureType.circle;
+                _Height = radius;
+                _Width = thickness;
+                _Thickness = thickness;
+            }
+            public override double SpaceB { get { return (1.1416 * (_Height * _Height)); } }
+            public override double SpaceNB { get { return (1.1416 * (_Height + _Thickness) * (_Height + _Thickness)); } }
+        }
         public class GraphicRedactor
         {
             private readonly List<Figure> _figures = new List<Figure>();
@@ -160,10 +174,37 @@ namespace LR3
             if (figure.Type == FigureType.rectangle) { DrawRectangle(figure); }
             if (figure.Type == FigureType.square) { DrawSquare(figure); }
             if (figure.Type == FigureType.ellipse) { DrawEllipse(figure); }
+            if (figure.Type == FigureType.circle) { DrawCicrle(figure); }
 
-            void DrawEllipse(Figure figure) 
+            void DrawCicrle(Figure figure) 
             {
-                
+                bool[,] desk = new bool[30, 30];
+                int Cx = desk.GetLength(0) / 2;
+                int Cy = desk.GetLength(1) / 2;
+                for (int i = -desk.GetLength(0); i < desk.GetLength(0); i++)
+                {
+                    for (int j = -desk.GetLength(1); j < desk.GetLength(1); j++)
+                    {
+                        if ((i*i) + (j*j) < (figure.Height * figure.Height)) { desk[i + Cx, j + Cy] = true; }
+                    }
+                }
+                //DrawOXY(desk);    //елси надо отаброзить координатные прямые
+                DrawDesk(desk);
+            }
+            void DrawEllipse(Figure figure)
+            {
+                bool[,] desk = new bool[30, 30];
+                int Cx = desk.GetLength(0) / 2;
+                int Cy = desk.GetLength(1) / 2;
+                for (int i = -Cx; i < Cx; i++)
+                {
+                    for (int j = -Cy; j < Cy; j++)
+                    {
+                        if (Math.Sqrt(i/figure.Width) + Math.Sqrt(j/figure.Height) < 1) { desk[i + Cx, j + Cy] = true; }
+                    }
+                }
+                //DrawOXY(desk);    //елси надо отаброзить координатные прямые
+                DrawDesk(desk);
             }
             void DrawSquare(Figure figure)
             {
@@ -240,11 +281,11 @@ namespace LR3
             bool isDrawOSYTrue = false;
             var myGraphicRedactor = new GraphicRedactor();
 
-            myGraphicRedactor.Add(new Rectangle(8, 8, 1));
-            myGraphicRedactor.Add(new Square(5, 1));
-            myGraphicRedactor.Add(new Ellipse(4, 4, 1));
+            //myGraphicRedactor.Add(new Rectangle(8, 8, 1));
+            //myGraphicRedactor.Add(new Square(5, 1));
+            myGraphicRedactor.Add(new Ellipse(10, 5, 1));
 
-            myGraphicRedactor.SortBySpaceNoBorder();
+            //myGraphicRedactor.SortBySpaceNoBorder();
 
             const string filename = "json.json";
             myGraphicRedactor.ToJson(filename);
