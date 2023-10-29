@@ -1,7 +1,5 @@
-﻿using System.Net.Http.Json;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using static LR3.LR3;
 //стандартная библиотка .NET
 
 namespace LR3
@@ -168,9 +166,9 @@ namespace LR3
                 return temp;
             }
         }
-        //TODO
         public static void DrawFigure(Figure figure)
         {
+            if (figure.Width > 15 | figure.Height > 15) { Console.WriteLine("The figure will be our of range, can't draw it!"); return; }
             if (figure.Type == FigureType.rectangle) { DrawRectangle(figure); }
             if (figure.Type == FigureType.square) { DrawSquare(figure); }
             if (figure.Type == FigureType.ellipse) { DrawEllipse(figure); }
@@ -196,11 +194,11 @@ namespace LR3
                 bool[,] desk = new bool[30, 30];
                 int Cx = desk.GetLength(0) / 2;
                 int Cy = desk.GetLength(1) / 2;
-                for (int i = -Cx; i < Cx; i++)
+                for (double i = -Cx; i < Cx; i++)
                 {
-                    for (int j = -Cy; j < Cy; j++)
+                    for (double j = -Cy; j < Cy; j++)
                     {
-                        if (Math.Sqrt(i/figure.Width) + Math.Sqrt(j/figure.Height) < 1) { desk[i + Cx, j + Cy] = true; }
+                        if ((Math.Pow(i/figure.Width, 2) + Math.Pow(j/figure.Height , 2)) < 1) { desk[Convert.ToInt32(i) + Cx, Convert.ToInt32(j) + Cy] = true; }
                     }
                 }
                 //DrawOXY(desk);    //елси надо отаброзить координатные прямые
@@ -221,7 +219,7 @@ namespace LR3
                 for (int i = x2; i >= x1; i--) { desk[y2, i] = true; }
                 for (int i = y2; i >= y1; i--) { desk[i, x2] = true; }
 
-                DrawOXY(desk);    //елси надо отаброзить координатные прямые
+                //DrawOXY(desk);    //елси надо отаброзить координатные прямые
                 DrawDesk(desk);
             }
             void DrawRectangle(Figure figure)
@@ -241,7 +239,7 @@ namespace LR3
                 for (int i = x2; i >= x1; i--) { desk[y2, i] = true; }
                 for (int i = y2; i >= y1; i--) { desk[i, x2] = true; }
                 
-                DrawOXY(desk);    //елси надо отаброзить координатные прямые
+                //DrawOXY(desk);    //елси надо отаброзить координатные прямые
                 DrawDesk(desk);
             }
             void DrawDesk(bool[,] desk)
@@ -281,11 +279,11 @@ namespace LR3
             bool isDrawOSYTrue = false;
             var myGraphicRedactor = new GraphicRedactor();
 
-            //myGraphicRedactor.Add(new Rectangle(8, 8, 1));
-            //myGraphicRedactor.Add(new Square(5, 1));
+            myGraphicRedactor.Add(new Rectangle(8, 8, 1));
+            myGraphicRedactor.Add(new Square(5, 1));
             myGraphicRedactor.Add(new Ellipse(10, 5, 1));
 
-            //myGraphicRedactor.SortBySpaceNoBorder();
+            myGraphicRedactor.SortBySpaceNoBorder();
 
             const string filename = "json.json";
             myGraphicRedactor.ToJson(filename);
