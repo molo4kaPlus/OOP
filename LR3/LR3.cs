@@ -1,6 +1,18 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 using System.Text.Json.Serialization;
-//стандартная библиотка .NET
+using Sharprompt;
+using static LR3.LR3;
+/*
+ * программа выполняет все задачи, прописанные в документе.
+ * 1. Упорядовачивание происходит каждую итерацию меню.
+ * 2. Вывод первых 4 фигур выполняется через меню, "Show first 4 elements".
+ * 3. Вывод 3 последних фигур выполняется по очереди (в случае выхода фигуры за рамки "поля", не рисует ее).
+ *    Координатная плоскость размером 30 на 30.
+ * 4. Фигуры упорядочиваются с каждой итерацией меню sharpromt.
+ * 5. Чтение\запись JSON требует ввода названия файла, который нужно создать\открыть. 
+ * 6. В случае ошибки чтения\записи JSON, выводит в консоль исключение.
+*/
 
 namespace LR3
 {
@@ -128,6 +140,10 @@ namespace LR3
             {
                 return _figures[num];
             }
+            public int Lenght()
+            {
+                return _figures.Count;
+            }
             public IEnumerable<Figure> GetFigures()
             {
                 return _figures;
@@ -152,7 +168,7 @@ namespace LR3
                     JsonSerializer.Serialize(stream, _figures, options);
                 }
             }
-            public static GraphicRedactor? FromJson(string filename)
+            public static GraphicRedactor FromJson(string filename)
             {
                 var temp = new GraphicRedactor();
                 List<Figure> figures;
@@ -264,42 +280,92 @@ namespace LR3
                 for (int i = 0; i < y; i++) { desk[x/2, i] = true; }
             }
         }
-        //TODO
-        public class Menu
-        {
-            string[] menuArgs =
-            {
-                
-            };
-
-        }
-        //жопа
         static void Main()
         {
-            bool isDrawOSYTrue = false;
-            var myGraphicRedactor = new GraphicRedactor();
+            bool flag = true;
+            string filename = "figures.json";
+            string[] menuArgs =
+            {
+                "Show all elements",
+                "Show first 4 elements",
+                "Add element",
+                "Draw last 3 elements",
+                "Serialize to JSON",
+                "Deserialize from JSON",
+                "Exit"
+            };
+            string[] menufigures = { "Square", "Rectangle", "Ellipse", "Circle", "I changed my mind, back" };
 
+            var myGraphicRedactor = new GraphicRedactor();
             myGraphicRedactor.Add(new Rectangle(8, 8, 1));
             myGraphicRedactor.Add(new Square(5, 1));
             myGraphicRedactor.Add(new Ellipse(10, 5, 1));
-
+            myGraphicRedactor.Add(new Circle(5, 1));
             myGraphicRedactor.SortBySpaceNoBorder();
 
-            const string filename = "json.json";
-            myGraphicRedactor.ToJson(filename);
-            //myGraphicRedactor.ToXML(filename);
-            DrawFigure(myGraphicRedactor.GetFigure(0));
-
-            try
+            Console.WriteLine("Welcome to the menu!");
+            while (flag) 
             {
-                var myGraphicRedactorNew = GraphicRedactor.FromJson(filename);
-                foreach (var figure in myGraphicRedactorNew.GetFigures())
+                var menu = Prompt.Select("Select", menuArgs);
+                myGraphicRedactor.SortBySpaceNoBorder();
+                if (menu == "Show all elements")
                 {
-                    Console.WriteLine($"Figure: {figure.Type}");
+                    for (int i = 0; i < myGraphicRedactor.Lenght(); i++)
+                    {
+                        Console.WriteLine($"Figure: {myGraphicRedactor.GetFigure(i).Type}, Space (no border): {myGraphicRedactor.GetFigure(i).SpaceNB}, Border thickness: {myGraphicRedactor.GetFigure(i).Thickness}");
+                    }
+                    Console.WriteLine($"\nTotalSpace = {myGraphicRedactor.TotalSpaceNoBorder}");
                 }
-                Console.WriteLine($"\nTotalSpace = {myGraphicRedactorNew.TotalSpaceNoBorder}");
+                if (menu == "Show first 4 elements") 
+                {
+                    for (int i = 0; i < 4; i++) 
+                    {
+                        Console.WriteLine($"Figure: {myGraphicRedactor.GetFigure(i).Type}");
+                    }
+                }
+                if (menu == "Add element")
+                {
+                    Console.WriteLine("What figure do you want to add?");
+                    var subMenuAdd = Prompt.Select("Select", menufigures);
+                    if (subMenuAdd == "Square") { Console.WriteLine("Type sides of the square, then thicness of border."); myGraphicRedactor.Add(new Square(Convert.ToInt32(Console.ReadLine()), Convert.ToInt32(Console.ReadLine()))); }
+                    if (subMenuAdd == "Rectangle") { Console.WriteLine("Type sides of the rectangle, then thicness of border."); myGraphicRedactor.Add(new Rectangle(Convert.ToInt32(Console.ReadLine()), Convert.ToInt32(Console.ReadLine()), Convert.ToInt32(Console.ReadLine()))); }
+                    if (subMenuAdd == "Ellipse") { Console.WriteLine("Type sides of rectangle, ellipse will be inserted in it. Then thicness of border."); myGraphicRedactor.Add(new Ellipse(Convert.ToInt32(Console.ReadLine()), Convert.ToInt32(Console.ReadLine()), Convert.ToInt32(Console.ReadLine()))); }
+                    if (subMenuAdd == "Circle") { Console.WriteLine("Type radius of the circle, Then thicness of border."); myGraphicRedactor.Add(new Circle(Convert.ToInt32(Console.ReadLine()), Convert.ToInt32(Console.ReadLine()))); }
+                }
+                if (menu == "Draw last 3 elements")
+                {
+                    for (int i = myGraphicRedactor.Lenght() - 1; i > myGraphicRedactor.Lenght() - 4; i--)
+                    {
+                        DrawFigure(myGraphicRedactor.GetFigure(i));
+                        Console.WriteLine($"Figure type: {myGraphicRedactor.GetFigure(i).Type}");
+                        Console.WriteLine($"Figure Space (No border): {myGraphicRedactor.GetFigure(i).SpaceNB}");
+                        Console.WriteLine("Enter to draw next figure...");
+                        Console.ReadLine();
+                    }
+                }
+                if (menu == "Serialize to JSON") 
+                {
+                    Console.WriteLine("Enter file name...");
+                    filename = Console.ReadLine();
+                    try
+                    {
+                        myGraphicRedactor.ToJson(filename);
+                    }
+                    catch (Exception ex) { Console.WriteLine($"Error: {ex.Message}"); }
+                }
+                if (menu == "Deserialize from JSON") 
+                {
+                    Console.WriteLine("Enter file name...");
+                    filename = Console.ReadLine();
+                    try
+                    {
+                        var myGraphicRedactorTemp = GraphicRedactor.FromJson(filename);
+                        myGraphicRedactor = myGraphicRedactorTemp;
+                    }
+                    catch (Exception ex) { Console.WriteLine($"Error: {ex.Message}"); }
+                }
+                if (menu == "Exit") { flag = false; }
             }
-            catch (Exception ex) { Console.WriteLine($"Error: {ex.Message}"); }
         }
     }
 }
