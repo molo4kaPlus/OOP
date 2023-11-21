@@ -65,8 +65,17 @@ namespace LR4
         static void Main()
         {
             Uri startPage = new Uri("https://mangalib.me/");
-            foreach (var href in hrefs)
-                Console.WriteLine(href);
+            using (WebScanner scanner = new WebScanner())
+            {
+                scanner.TargetFound += (page, links) =>
+                {
+                    Console.WriteLine($"\nPage:\n\t{page}\nLinks:");
+                    foreach (var link in links)
+                        Console.WriteLine($"\t{link}");
+                };
+                scanner.Scan(startPage, 4);
+                Console.WriteLine("Done.");
+            }
         }
     }
 }
