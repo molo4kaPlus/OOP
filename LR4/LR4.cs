@@ -3,6 +3,7 @@ using System.Net;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Security.Cryptography;
+using System.Numerics;
 
 namespace LR4
 {
@@ -10,11 +11,11 @@ namespace LR4
     {
         private readonly HashSet<Uri> _procLinks = new HashSet<Uri>();
         private readonly WebClient _webClient = new WebClient();
-        private readonly HashSet<string> _ignoreFiles = new HashSet<string>() { ".ico", "xml" };
+        private readonly HashSet<string> _ignoreFiles = new HashSet<string>() { ".ico", "xml"};
 
-        public event Action<Uri, Uri[]> TargetFound;
+        public event Action<Uri, List<string>> TargetFound;
 
-        private void OnTargetFound(Uri page, Uri[] links)
+        private void OnTargetFound(Uri page, List<string> links)
         {
             TargetFound?.Invoke(page, links);
         }
@@ -26,7 +27,7 @@ namespace LR4
             _procLinks.Add(page);
             string html = _webClient.DownloadString(page);
 
-            var hrefs = (from href in Regex.Matches(html, @"href=""[\/\w -\.:]+""").Cast<Match>()
+            var hrefs = (from href in Regex.Matches(html, @"src="".*?\.(jpg|jpeg|png)").Cast<Match>()
                          let url = href.Value.Replace("href=", "").Trim('"')
                          let loc = url.StartsWith("/")
                          select new
@@ -36,16 +37,19 @@ namespace LR4
                          }
                          ).ToList();
 
-            var externals = (from href in hrefs where !href.IsLocal select href.Ref).ToArray();
-            if (externals.Length > 0) OnTargetFound(page, externals);
-            var locals = (from href in hrefs where href.IsLocal select href.Ref).ToList();
+
+            List<string> externals = new List<string> { };
+            foreach (var href in hrefs) { if (!href.IsLocal) { externals.Add(href.Ref); } }
+            if (externals.Count > 0) OnTargetFound(page, externals);
+            List<string> locals = new List<string> { };
+            foreach (var href in hrefs) { if (href.IsLocal) { locals.Add(href.Ref); } }
 
             foreach (var href in locals)
             {
-                string fielEx = Path.GetExtension(href.LocalPath).ToLower();
+                string fielEx = Path.GetExtension(href).ToLower();
                 if (_ignoreFiles.Contains(fielEx)) continue;
 
-                Process(domain, href, --count);
+                Process(domain, new Uri(href), --count);
             }
         }
         public void Scan(Uri startPage, int pageCount)
@@ -73,7 +77,7 @@ namespace LR4
                     foreach (var link in links)
                         Console.WriteLine($"\t{link}");
                 };
-                scanner.Scan(startPage, 4);
+                scanner.Scan(startPage, 30);
                 Console.WriteLine("Done.");
             }
         }
